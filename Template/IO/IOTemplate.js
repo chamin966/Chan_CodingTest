@@ -7,7 +7,7 @@ for (let i = 1; i <= n; i++) {
   data.push(input[i]);
 }
 
-const solution = pram => {
+function solution(param){
 
 }
 
