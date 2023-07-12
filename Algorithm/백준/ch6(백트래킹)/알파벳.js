@@ -21,12 +21,11 @@ function solution(arr){
       let ny = dy[i] + col;
       // nx >= 0 && nx < arr.length && ny >= 0 && ny < arr[0].length
       // 위 식을 벗어난 경우는 전부 해당하므로 아래와 같이 바꾸면 더 빠르다.
-      if(nx < 0 || nx => arr.length || ny < 0 || ny >= arr[0].length){
-        if(!visited.has(arr[nx][ny])){
-          visited.add(arr[nx][ny]);
-          dfs(dep + 1, nx, ny);
-          visited.delete(arr[nx][ny]);
-        }
+      if(nx < 0 || nx >= arr.length || ny < 0 || ny >= arr[0].length) continue;
+      if(!visited.has(arr[nx][ny])){
+        visited.add(arr[nx][ny]);
+        dfs(dep + 1, nx, ny);
+        visited.delete(arr[nx][ny]);
       }
     }
   }
