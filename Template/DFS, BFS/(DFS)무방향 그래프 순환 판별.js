@@ -1,3 +1,55 @@
+function solution(graphs){
+  let answer = [];
+  
+  const isCycle = (graph, visited, now, prev) => {
+    visited[now] = true;
+    for(let next of graph[now]){
+      if(visited[next] === false){
+        if(isCycle(graph, visited, next, now)) return true;
+      }
+      else if (next !== prev) return true;
+    }
+    return false
+  }
+
+  for(let graph of graphs){
+    let tmp = 0;
+    const visited = Array.from({length: graph.length}, () => false);
+    for(let i = 1; i < graph.length; i++){
+      if (!visited[i]){
+        if(!isCycle(graph, visited, i, 0)) tmp += 1
+      }
+    }
+    answer.push(tmp);
+  }
+
+/** 
+입력
+6 3
+1 2
+2 3
+3 4
+6 5
+1 2
+2 3
+3 4
+4 5
+5 6
+6 6
+1 2
+2 3
+1 3
+4 5
+5 6
+6 4
+0 0
+
+출력
+Case 1: A forest of 3 trees.
+Case 2: There is one tree.
+Case 3: No trees.
+*//
+
 let fs = require('fs')
 let input = fs.readFileSync('/dev/stdin').toString().split('\n')
 
@@ -34,11 +86,6 @@ function solution(graphs){
   for(let graph of graphs){
     let tmp = 0;
     const visited = Array.from({length: graph.length}, () => false);
-    
-    // 각 위치에서 연결 요소 계산 및 사이클 판단
-    // graph를 순환하는 것이 아니라
-    // 1 ~ N(0 추가돤 길이이므로 graph 인덱스 끝까지 감)까지 순서대로
-    // 순환해야 함에 주의한다. graph 자체를 순환하면 편의상 넣은 0이 값을 망친다.
     for(let i = 1; i < graph.length; i++){
       if (!visited[i]){
         if(!isCycle(graph, visited, i, 0)) tmp += 1
