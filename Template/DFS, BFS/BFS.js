@@ -1,31 +1,31 @@
 // 큐 사용
-class Queue{
-  constructor(){
+class Queue {
+  constructor() {
     this.items = {};
-    this.headIndex = 0;
-    this.tailIndex = 0;
+    this.head = 0;
+    this.tail = 0;
   }
-  enq(item) {this.items[this.tailIndex++] = item;}
+  enq(item) { this.items[this.tail++] = item; }
   deq() {
-    const item = this.items[this.headIndex];
-    delete this.items[this.headIndex++];
+    const item = this.items[this.head];
+    delete this.items[this.head++];
     return item;
   }
-  peek() {return this.items[this.headIndex]}
-  getLength() {return this.tailIndex - this.headIndex;}
+  peek() { return this.items[this.head] }
+  getLength() { return this.tail - this.head; }
 }
 
-// DFS와 달리 재귀함수 호출이 없
-function bfs(graph, start, visited){
+// DFS와 달리 재귀함수 호출이 없다.
+function bfs(graph, start, visited) {
   q = new Queue();
-  q.enq(start); 
+  q.enq(start);
   visited[start] = true;
   // 큐가 빌 때까지 반복
-  while(q.getLength() !== 0){
+  while (q.getLength() !== 0) {
     v = q.deq();
     console.log(v);
-    for(let x of graph[v]){
-      if(visited[x] === false){
+    for (let x of graph[v]) {
+      if (visited[x] === false) {
         q.enq(x);
         visited[x] = true;
       }
