@@ -19,7 +19,7 @@ class Queue {
 function bfs(graph, start, visited) {
   q = new Queue();
   q.enq(start);
-  visited[start] = true;
+  visited[start] = true; // 반드시 시작지점 방문처리!
   // 큐가 빌 때까지 반복
   while (q.getLength() !== 0) {
     v = q.deq();
@@ -46,5 +46,7 @@ const graph = [
 ];
 // 각 노드가 방문된 정보를 표현
 const visited = Array(9).fill(false);
+// 비용이나 시간의 최소, 최댓값을 찾는 문제라면 -1로 초기화하고
+// 단순 모든 노드의 탐색이라면 true, false로 초기화한다.
 // 정의된 BFS 함수 호출
 bfs(graph, 1, visited);
