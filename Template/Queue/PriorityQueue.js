@@ -1,189 +1,105 @@
-/**
- * Expose `PriorityQueue`.
- */
-module.exports = PriorityQueue;
+class PriorityQueue {
+  constructor(compare = (a, b) => a - b) {
+    this.heap = [];
+    this.compare = compare;
+  }
 
-/**
- * Initializes a new empty `PriorityQueue` with the given `comparator(a, b)`
- * function, uses `.DEFAULT_COMPARATOR()` when no function is provided.
- *
- * The comparator function must return a positive number when `a > b`, 0 when
- * `a == b` and a negative number when `a < b`.
- *
- * @param {Function}
- * @return {PriorityQueue}
- * @api public
- */
-function PriorityQueue(comparator) {
-  this._comparator = comparator || PriorityQueue.DEFAULT_COMPARATOR;
-  this._elements = [];
+  getLeftChildIndex = parentIndex => 2 * parentIndex + 1;
+  getRightChildIndex = parentIndex => 2 * parentIndex + 2;
+  getParentIndex = childIndex => Math.floor((childIndex - 1) / 2);
+
+  hasParent = childIndex => this.getParentIndex(childIndex) >= 0;
+  hasLeftChild = parentIndex => this.getLeftChildIndex(parentIndex) < this.heap.length;
+  hasRightChild = parentIndex => this.getRightChildIndex(parentIndex) < this.heap.length;
+
+  leftChild = parentIndex => this.heap[this.getLeftChildIndex(parentIndex)];
+  rightChild = parentIndex => this.heap[this.getRightChildIndex(parentIndex)];
+  parent = childIndex => this.heap[this.getParentIndex(childIndex)];
+
+  swap = (index1, index2) => [this.heap[index1], this.heap[index2]] = [this.heap[index2], this.heap[index1]];
+
+  heapifyDown = () => {
+    let currentIndex = 0;
+    while (this.hasLeftChild(currentIndex)) {
+      let childIndexToSwap = this.getLeftChildIndex(currentIndex);
+      if (this.hasRightChild(currentIndex) && this.compare(this.rightChild(currentIndex), this.leftChild(currentIndex)) > 0) {
+        childIndexToSwap = this.getRightChildIndex(currentIndex);
+      }
+
+      if (this.compare(this.heap[currentIndex], this.heap[childIndexToSwap]) >= 0) {
+        break;
+      }
+
+      this.swap(currentIndex, childIndexToSwap);
+      currentIndex = childIndexToSwap;
+    }
+  }
+
+  enq(value) {
+    this.heap.push(value);
+    let currentIndex = this.heap.length - 1;
+    while (this.hasParent(currentIndex) && this.compare(this.parent(currentIndex), this.heap[currentIndex]) < 0) {
+      this.swap(currentIndex, this.getParentIndex(currentIndex));
+      currentIndex = this.getParentIndex(currentIndex);
+    }
+  }
+
+  deq() {
+    if (this.heap.length === 0) return null;
+    if (this.heap.length === 1) return this.heap.pop();
+
+    const top = this.heap[0];
+    this.heap[0] = this.heap.pop();
+    this.heapifyDown();
+    return top;
+  }
+
+  peek() { return (this.heap.length === 0) ? null : this.heap[0]; }
+
+  size() { return this.heap.length; }
 }
 
-/**
- * Compares `a` and `b`, when `a > b` it returns a positive number, when
- * it returns 0 and when `a < b` it returns a negative number.
- *
- * @param {String|Number} a
- * @param {String|Number} b
- * @return {Number}
- * @api public
- */
-PriorityQueue.DEFAULT_COMPARATOR = function(a, b) {
-  if (typeof a === 'number' && typeof b === 'number') {
-    return a - b;
-  } else {
-    a = a.toString();
-    b = b.toString();
+// 예제 사용:
+const pqMax1 = new PriorityQueue((a, b) => a - b); // 최대 힙 (a - b)
+pqMax1.enq(10);
+pqMax1.enq(5);
+pqMax1.enq(20);
+pqMax1.enq(3);
 
-    if (a == b) return 0;
+console.log(pqMax1.deq()); // 출력: 20
+console.log(pqMax1.deq()); // 출력: 10
+console.log();
 
-    return (a > b) ? 1 : -1;
-  }
-};
 
-/**
- * Returns whether the priority queue is empty or not.
- *
- * @return {Boolean}
- * @api public
- */
-PriorityQueue.prototype.isEmpty = function() {
-  return this.size() === 0;
-};
+const pqMin1 = new PriorityQueue((a, b) => b - a); // 최소 힙 (b - a)
+pqMin1.enq(10);
+pqMin1.enq(5);
+pqMin1.enq(20);
+pqMin1.enq(3);
 
-/**
- * Peeks at the top element of the priority queue.
- *
- * @return {Object}
- * @throws {Error} when the queue is empty.
- * @api public
- */
-PriorityQueue.prototype.peek = function() {
-  if (this.isEmpty()) throw new Error('PriorityQueue is empty');
+console.log(pqMin1.deq()); // 출력: 3
+console.log(pqMin1.deq()); // 출력: 5
+console.log();
 
-  return this._elements[0];
-};
+// 최대힙(Max Heap) (a-b)
+let pqMax2 = new PriorityQueue((a, b) => a.cash - b.cash);
+pqMax2.enq({ cash: 250, name: 'Doohyun Kim' });
+pqMax2.enq({ cash: 300, name: 'Gildong Hong' });
+pqMax2.enq({ cash: 150, name: 'Minchul Han' });
+console.log(pqMax2.size()); // 3
+console.log(pqMax2.deq()); // {cash: 300, name: 'Gildong Hong'}
+console.log(pqMax2.peek()); // {cash: 250, name: 'Doohyun Kim'}
+console.log(pqMax2.size()); // 2
+console.log();
 
-/**
- * Dequeues the top element of the priority queue.
- *
- * @return {Object}
- * @throws {Error} when the queue is empty.
- * @api public
- */
-PriorityQueue.prototype.deq = function() {
-  var first = this.peek();
-  var last = this._elements.pop();
-  var size = this.size();
 
-  if (size === 0) return first;
-
-  this._elements[0] = last;
-  var current = 0;
-
-  while (current < size) {
-    var largest = current;
-    var left = (2 * current) + 1;
-    var right = (2 * current) + 2;
-
-    if (left < size && this._compare(left, largest) >= 0) {
-      largest = left;
-    }
-
-    if (right < size && this._compare(right, largest) >= 0) {
-      largest = right;
-    }
-
-    if (largest === current) break;
-
-    this._swap(largest, current);
-    current = largest;
-  }
-
-  return first;
-};
-
-/**
- * Enqueues the `element` at the priority queue and returns its new size.
- *
- * @param {Object} element
- * @return {Number}
- * @api public
- */
-PriorityQueue.prototype.enq = function(element) {
-  var size = this._elements.push(element);
-  var current = size - 1;
-
-  while (current > 0) {
-    var parent = Math.floor((current - 1) / 2);
-
-    if (this._compare(current, parent) <= 0) break;
-
-    this._swap(parent, current);
-    current = parent;
-  }
-
-  return size;
-};
-
-/**
- * Returns the size of the priority queue.
- *
- * @return {Number}
- * @api public
- */
-PriorityQueue.prototype.size = function() {
-  return this._elements.length;
-};
-
-/**
- *  Iterates over queue elements
- *
- *  @param {Function} fn
- */
-PriorityQueue.prototype.forEach = function(fn) {
-  return this._elements.forEach(fn);
-};
-
-/**
- * Compares the values at position `a` and `b` in the priority queue using its
- * comparator function.
- *
- * @param {Number} a
- * @param {Number} b
- * @return {Number}
- * @api private
- */
-PriorityQueue.prototype._compare = function(a, b) {
-  return this._comparator(this._elements[a], this._elements[b]);
-};
-
-/**
- * Swaps the values at position `a` and `b` in the priority queue.
- *
- * @param {Number} a
- * @param {Number} b
- * @api private
- */
-PriorityQueue.prototype._swap = function(a, b) {
-  var aux = this._elements[a];
-  this._elements[a] = this._elements[b];
-  this._elements[b] = aux;
-};
-
-//사용 예제-----------------------------------------------------------
-//npm install priorityqueuejs
-
-var PriorityQueue = require('priorityqueuejs');
-
-var queue = new PriorityQueue((a, b) => a.cash - b.cash); // maxHeap
-// var queue = new PriorityQueue((a, b) => b.cash - a.cash); // minHeap
-
-queue.enq({ cash: 250, name: 'Valentina' });
-queue.enq({ cash: 300, name: 'Jano' });
-queue.enq({ cash: 150, name: 'Fran' });
-console.log('size:', queue.size()); 
-console.log('peek:', queue.peek()); 
-console.log('deq:', queue.deq()); 
-console.log('peek:', queue.peek());
-console.log('size:', queue.size());
+// 최소힙(Min Heap) (b-a)
+let pqMin2 = new PriorityQueue((a, b) => b.cash - a.cash);
+pqMin2.enq({ cash: 250, name: 'Doohyun Kim' });
+pqMin2.enq({ cash: 300, name: 'Gildong Hong' });
+pqMin2.enq({ cash: 150, name: 'Minchul Han' });
+console.log(pqMin2.size()); // 3
+console.log(pqMin2.deq()); // {cash: 150, name: 'Minchul Han'}
+console.log(pqMin2.peek()); // {cash: 250, name: 'Gildong Hong'}
+console.log(pqMin2.size()); // 2
+console.log();

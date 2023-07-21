@@ -12,7 +12,7 @@ class Queue {
     return item;
   }
   peek() { return this.items[this.head] }
-  getLength() { return this.tail - this.head; }
+  size() { return this.tail - this.head; }
 }
 
 // DFS와 달리 재귀함수 호출이 없다.

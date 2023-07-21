@@ -13,12 +13,11 @@ function bf(start) {
         if (i == n - 1) return true;
       }
     }
-        console.log(dist)
   }
   return false;
 }
 
-let INF = Infinity;
+let INF = 1e9; // 무한을 의미하는 값으로 10억을 설정
 let n = 6; // 노드의 개수
 let m = 9; // 간선의 개수
 // 모든 간선에 대한 정보를 담는 리스트 만들기
