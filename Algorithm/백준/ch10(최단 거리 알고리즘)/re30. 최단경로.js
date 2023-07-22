@@ -62,43 +62,40 @@ class PriorityQueue {
 let fs = require('fs')
 let input = fs.readFileSync('/dev/stdin').toString().split('\n')
 
-let [nodeCnt, loadCnt] = input[0].split(' ').map(v => Number(v));
-const data = Array.from({length: nodeCnt + 1}, () => []);
-for (let i = 1; i <= loadCnt; i++) {
-  let [a, b, c] = input[i].split(' ').map(v => Number(v));
-  data[a].push([b, c]);
-  data[b].push([a, c]);
+let [v, e] = input[0].split(' ').map(v => Number(v));
+let start = input[1]
+const data = Array.from({length: v + 1}, () => []);
+for (let i = 2; i < e + 2; i++) {
+  let [u, v, w] = input[i].split(' ').map(v => Number(v));
+  data[u].push([v, w]);
 }
 
-function solution(graph, nodeCnt, loadCnt){
+function solution(graph, start, v){
   let INF = Infinity;
-  let start = 1;
-
-  // distance[부서진 출발 노드][부서진 도착 노드] => 최소 소요 비용
-  const distance = Array.from({length: nodeCnt + 1}, () => new Array(loadCnt + 1).fill(INF));
-
-  // [현재 노드, 현재까지 비용, 부서진 출발 노드, 부서진 도착 노드]
-  const pq = new PriorityQueue((a, b) => b[1] - a[1]);
-  pq.enq([start, 0, 0, 0]);
-  distance[0][0] = 0;
-  while(pq.size() > 0){
-    let [curNode, curCost, curDX, curDY] = pq.deq();
-    if(curNode === curDX || curCost > distance[curDX][curDY]) continue;
-    for(let [nextNode, nextCost] of graph[curNode]){
-      if(nextNode === curDY) continue;
-      let newCost = curCost + nextCost;
-      if(distance[curDX][curDY] > newCost){
-        distance[curDX][curDY] = newCost;
-        pq.enq([nextNode, newCost, curDX, curDY]);
-      }
-      if(curCost < distance[curNode][nextNode]){
-        distance[curNode][nextNode] = curCost;
-        pq.enq([curNode, curCost, curNode, nextNode]);
+  const distance = new Array(v + 1).fill(INF);
+  const minHeap = new PriorityQueue((a, b) => b[1] - a[1]); // 최소힙
+  minHeap.enq([start, 0]);
+  distance[start] = 0;
+  
+  while(minHeap.size() > 0){
+    let [cur, curCost] = minHeap.deq();
+    if(distance[cur] < curCost) continue;
+    for(let [nextNode, nextCost] of graph[cur]){
+      let newCost =  curCost + nextCost;
+      if(newCost < distance[nextNode]){
+        distance[nextNode] = newCost;
+        minHeap.enq([nextNode, newCost]);
       }
     }
   }
-  
-  return distance;
+
+  let answer = ''
+  for(let i = 1; i <= v; i++){
+    if(distance[i] === Infinity) answer += 'INF' + '\n'
+    else answer +=  distance[i] + '\n';
+  }
+
+  return answer;
 }
 
-console.log(solution(data, nodeCnt, loadCnt));
+console.log(solution(data, start, v));

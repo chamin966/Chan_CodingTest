@@ -36,10 +36,28 @@ let graph = [ // 자기 자신으로 가는 비용은0으로 초기화
   [INF, INF, INF,1, INF,0] // 5번 노드의 간선들
 ]
 
+/** 
+입력으로 그래프를 만들어야 한다면 행과 열이 같은 지점에는 0을 넣어주고
+a행 b열에 a에서 b로 바로 갈 수 있을 때의 최소 비용을 넣어준다.
+a에서 b로 가는 비용이 여러 개 있을 수 있으므로
+그 중에서 최솟값을 넣어서 초기 테이블을 만들어준다.
+const data = Array.from({length: n + 1}, (_, i) => {
+  let tmp = new Array(n + 1).fill(INF);
+  tmp[i] = 0;
+  return tmp;
+})
+
+for(let i = 2; i < bus + 2;  i++){
+  let [a, b, c] = input[i].split(' ').map(v => Number(v));
+  data[a][b] = Math.min(data[a][b], c);
+}
+*/
+
+
 // 점화식에 따라 플로이드 워셜 알고리즘을 수행
-for(let k = 1; k <= n;k++) {
-  for(let a = 1; a <= n;a++) {
-    for(let b = 1; b <= n;b++) {
+for(let k = 1; k <= n; k++) {
+  for(let a = 1; a <= n; a++) {
+    for(let b = 1; b <= n; b++) {
       let cost = graph[a][k] + graph[k][b];
       graph[a][b] = Math.min(graph[a][b], cost);
     }

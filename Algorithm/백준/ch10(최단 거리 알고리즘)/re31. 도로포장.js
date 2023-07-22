@@ -62,43 +62,43 @@ class PriorityQueue {
 let fs = require('fs')
 let input = fs.readFileSync('/dev/stdin').toString().split('\n')
 
-let [nodeCnt, loadCnt] = input[0].split(' ').map(v => Number(v));
-const data = Array.from({length: nodeCnt + 1}, () => []);
-for (let i = 1; i <= loadCnt; i++) {
+let [city, load, k] = input[0].split(' ').map(v => Number(v));
+const data = Array.from({length: city + 1}, () => []);
+for (let i = 1; i <= load; i++) {
   let [a, b, c] = input[i].split(' ').map(v => Number(v));
   data[a].push([b, c]);
   data[b].push([a, c]);
 }
 
-function solution(graph, nodeCnt, loadCnt){
-  let INF = Infinity;
+function solution(graph, city, load, k){
+  let answer = Number.MAX_VALUE;
+  let INF = Infinity
   let start = 1;
+  // 외부 인덱스가 노드 번호, 내부 인덱스는 포장 횟수
+  // distance[nodeNum][pavedCnt] === 포장한 횟수에 따른 최솟값
+  const distance = Array.from({length: city + 1}, () => new Array(k + 1).fill(INF))
 
-  // distance[부서진 출발 노드][부서진 도착 노드] => 최소 소요 비용
-  const distance = Array.from({length: nodeCnt + 1}, () => new Array(loadCnt + 1).fill(INF));
-
-  // [현재 노드, 현재까지 비용, 부서진 출발 노드, 부서진 도착 노드]
-  const pq = new PriorityQueue((a, b) => b[1] - a[1]);
-  pq.enq([start, 0, 0, 0]);
-  distance[0][0] = 0;
+  const pq = new PriorityQueue((a, b) => b[1] - a[1]); //최소힙
+  pq.enq([start, 0, 0]); //(노드 번호, 비용, 포장 횟수)
+  distance[start][0] = 0;
+  
   while(pq.size() > 0){
-    let [curNode, curCost, curDX, curDY] = pq.deq();
-    if(curNode === curDX || curCost > distance[curDX][curDY]) continue;
+    let [curNode, curCost, pavedCnt] = pq.deq();
+    if(distance[curNode][pavedCnt] < curCost) continue;
     for(let [nextNode, nextCost] of graph[curNode]){
-      if(nextNode === curDY) continue;
       let newCost = curCost + nextCost;
-      if(distance[curDX][curDY] > newCost){
-        distance[curDX][curDY] = newCost;
-        pq.enq([nextNode, newCost, curDX, curDY]);
+      if(newCost < distance[nextNode][pavedCnt]){
+        distance[nextNode][pavedCnt] = newCost;
+        pq.enq([nextNode, newCost, pavedCnt]);
       }
-      if(curCost < distance[curNode][nextNode]){
-        distance[curNode][nextNode] = curCost;
-        pq.enq([curNode, curCost, curNode, nextNode]);
+      if(pavedCnt < k && curCost < distance[nextNode][pavedCnt + 1]){
+        distance[nextNode][pavedCnt + 1] = curCost;
+        pq.enq([nextNode, curCost, pavedCnt + 1]);
       }
     }
   }
   
-  return distance;
+  return Math.min(...distance[city]);
 }
 
-console.log(solution(data, nodeCnt, loadCnt));
+console.log(solution(data, city, load, k));

@@ -14,9 +14,13 @@
     -> 최소힙을 사용하기 때문에, 넣었다 빼는 것만으로 가장 최소 비용을 얻을 수 있다.
   4. deq를 실행하면 최소힙에 의해 이전 노드에서 최소 비용으로 이동한 노드가 배출되고,
      현재 노드(now)에 인접한 노드들(graph[now])을 순환하며,
-     이동할 가치가 있는 노드인지 확인(현재 최단 거리 테이블에 저장된 비용보다 작은 비용을 가진 노드)하고,
-     가치가 있는 노드들의 거리와 현재 노드가 지나온 거리의 합(cost = 거리 + next[1])을 구한다.
-  5. 그 합이 최단 거리 테이블에 저장된 해당 노드가 가진 비용(distance[next[0]])보다 작다면
+     이동할 가치가 있는 노드(현재 최단 거리 테이블에 저장된 비용보다
+     작은 비용으로 이동할 수 있는 노드 == 시작점에서 현재 노드까지 더 작은 비용으로
+     도달 가능한 노드)인지 확인하고,
+     가치가 있는 노드들이 지나온 거리와 현재 노드가 지나온 거리의 합
+     (cost = 거리 + next[1])을 구한다.
+  5. 그 합이 최단 거리 테이블에 저장된 해당 노드가 시작점부터 지나온 비용
+     (distance[next[0]])보다 작다면
      (기존 a -> b로 가는 최소 비용보다 현재 노드를 거쳐서 a -> now -> b로 가는 비용이 더 작다면)
      최단 거리 테이블의 비용을 갱신하고, 큐에 노드와 비용 정보[cost, next[0]]를 삽입한다.
   6. 다시 인접 노드들의 번호와 거리를 큐에 넣는다.
@@ -111,4 +115,34 @@ dijkstra(1);
 for (let i = 1; i <= n; i++) {
   if (distance[i] == ㅑ) console.log('INFINITY')
   else console.log(distance)
+}
+
+// 활용
+// 다익스트라는  a -> b 간선이 여러 개여도 템플릿은 안바뀜
+function solution(graph, start, v){
+  let INF = Infinity;
+  const distance = new Array(v + 1).fill(INF); // 최단 거리 1차원 배열 무한으로 초기화
+  const minHeap = new PriorityQueue((a, b) => b[1] - a[1]); // 최소힙
+  minHeap.enq([start, 0]); // 시작점 큐에 넣고
+  distance[start] = 0; // 시작점 방문 처리
+  
+  while(minHeap.size() > 0){
+    let [cur, curCost] = minHeap.deq();
+    if(distance[cur] < curCost) continue;
+    for(let [nextNode, nextCost] of graph[cur]){
+      let newCost =  curCost + nextCost;
+      if(newCost < distance[nextNode]){
+        distance[nextNode] = newCost;
+        minHeap.enq([nextNode, newCost]);
+      }
+    }
+  }
+
+  let answer = ''
+  for(let i = 1; i <= v; i++){
+    if(distance[i] === Infinity) answer += 'INF' + '\n'
+    else answer +=  distance[i] + '\n';
+  }
+
+  return answer;
 }
