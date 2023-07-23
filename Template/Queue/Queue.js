@@ -11,7 +11,7 @@ class Queue {
     return item;
   }
   peek() { return this.items[this.head] }
-  getLength() { return this.tail - this.head; }
+  size() { return this.tail - this.head; }
 }
 
 q = new Queue();
@@ -26,7 +26,7 @@ q.deq();
 q.enq(6);
 q.enq(7);
 
-while (q.getLength() !== 0) {
+while (q.size() !== 0) {
   console.log('peek:', q.peek()) // 현재 큐의 가장 첫 인덱스에 저장된 값
   console.log(q.deq());
 }

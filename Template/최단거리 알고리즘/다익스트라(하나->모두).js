@@ -28,6 +28,8 @@
 */
 
 function dijkstra() { // 다익스트라 (Dijkstra) 알고리즘 수행
+
+  // 비교함수 꼭 넣어야 하고, 기준이 몇번 인덱스인찌 필수로 확인!!!!
   let pq = new PriorityQueue((a, b) => b[0] - a[0]); // 최소힙(Min Heap)
   // 시작 노드로 가기 위한 최단 거리는 0으로 우선순위 큐에 삽입
   pq.enq([start, 0]);
